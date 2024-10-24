@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Icon -->
+    <link rel="stylesheet" href="remix/remixicon.css" type="text/css">
+    <title>Ecommerce</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        nav {
+            background-color: #8f8acf;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        a {
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        img {
+            display: inline-block;
+            max-width: 100%;
+        }
+
+        nav .logo {
+            font-size: 28px;
+            color: rgb(249, 249, 249);
+        }
+
+        nav .navigation {
+            color: rgb(15, 13, 13);
+            background-color: white;
+            font-size: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            margin-right: 10px;
+            &:hover {
+                color:  white;
+                background: rgb(5, 5, 5);
+            }
+        }
+        .heading {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .sorting{
+            text-align: right;
+            padding: 0 15px;
+        }
+
+        #container {
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: auto;
+            gap: 15px;
+        }
+
+        .card {
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: rgba(185, 223, 103, 0.2) 0px 7px 29px 0px;
+            text-align: center;
+        }
+
+        .card img {
+            height: 200px;
+            width: 200px;
+        }
+
+        .card .productPrice {
+            font-size: 24px;
+            font-style: italic;
+            color:#8f8acf;
+            margin: 10px 0;
+        }
+        #search{
+             padding: 10px;
+             &:hover{
+                background-color: rgb(177, 190, 228);
+                color: rgb(230, 55, 55);
+                border: #ffcc5f;
+             }
+        }
+
+        .card .rating {
+            font-size: 20px;
+        }
+
+        .ri-star-fill {
+            color: orange;
+        }
+
+        .card .editBtn {
+            width: 85%;
+            margin: 10px;
+            padding: 10px 20px;
+            background: #F4BC42;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s linear;
+
+            &:hover {
+                background: #ffcc5f;
+            }
+        }
+
+        .card .deletebtn {
+            width: 85%;
+            background:rgb(148, 174, 69);
+            padding: 10px 0;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.2s linear;
+
+            &:hover {
+                background: rgb(148, 174, 69);
+            }
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        #prevbtn,
+        #nextbtn {
+            margin: 0 8px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        #showPage {
+            margin: 0 15px;
+        }
+        .logo{
+            color: #f3ca71;
+            &:hover {
+                color: #d1d768;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <!-- Navigation  -->
+        <nav>
+            <a href="./CRUDwithproductsapi.html" class="logo">MAKEUP-DISCORD</a>
+            <div>
+                <input id="search" type="text" placeholder="Search here...">
+                <a href="./signUp.html" class="navigation">SignUp</a>
+                <a href="./login.html" class="navigation">Log In</a>
+                <a href="./Add_to_cart.html" class="navigation" >Cart</a>
+            </div>
+        </nav>
+
+        <h1 class="heading">Products</h1>
+
+        <div class="sorting">
+            <button id="asc">Ascending</button>
+            <button id="desc">Descending</button>
+
+            <select name="" id="category">
+                <option value="all">All</option>
+                <option value="beauty">Beauty</option>
+                <option value="fragrances">Fragrances</option>
+                <option value="furniture">Furniture</option>
+                <option value="groceries">Groceries</option>
+            </select>
+        </div>
+
+        <div id="container"></div>
+
+        <div class="pagination">
+            <button id="prevbtn" onclick="prevpageFunction()" disabled>Prev</button>
+            <span id="showPage"></span>
+            <button id="nextbtn" onclick="nextpageFunction()">Next</button>
+        </div>
+    </div>
+
+
+    <script>
+        let productsArr = [];  
+        let page = 1;
+
+        function fetchFunction() {
+            fetch(`https://dummyjson.com/products?limit=8&skip=${(page - 1) * 8}`)           
+                .then((res) => res.json())          // promise
+                .then((data) => {
+                    console.log(data.products)
+                    productsArr = data.products
+
+                    displayProducts(productsArr)
+                })
+                .catch((rej) => console.log(rej))
+        }
+
+        fetchFunction();
+
+        let container = document.querySelector("#container");
+
+        function displayProducts(data) {
+
+            container.innerHTML = ""
+
+            data.forEach((item) => {
+                let card = document.createElement("div")
+                card.classList.add("card")
+                container.append(card);
+
+                let image = document.createElement("img")
+                image.src = item.images[0];
+                image.addEventListener(("click"), () => {
+                    localStorage.setItem("singleProduct", JSON.stringify(item));
+                    window.location.href = "single_product_page.html"
+                })
+
+                let title = document.createElement("h2")
+                title.innerHTML = item.title;
+                title.addEventListener(("click"), () => {
+                    localStorage.setItem("singleProduct", JSON.stringify(item));
+                    window.location.href = "single_product_page.html"
+                })
+
+                let price = document.createElement("p")
+                price.innerHTML = `Price : ${item.price} $`
+                price.classList.add("productPrice");
+
+                let rating = document.createElement("p")
+                rating.innerHTML = `Rating : ${item.rating} <i class="ri-star-fill"></i>`
+                rating.classList.add("rating");
+
+                let edit = document.createElement("button")
+                edit.innerHTML = "Edit Details"
+                edit.classList.add("editBtn");
+                edit.addEventListener(("click"), () => {
+                    updateData(item)
+                })
+
+                let remove = document.createElement("button")
+                remove.innerHTML = "Delete"
+                remove.classList.add("deletebtn")
+
+                remove.addEventListener(("click"), () => {
+                    deleteItem(item.id);
+                })
+
+                card.append(image, title, price, rating, edit, remove)
+            });
+        };
+
+   
+        function deleteItem(id) {
+            fetch(`https://dummyjson.com/products/${id}`, {
+                method: "DELETE"
+            }).then((res) => res.json())
+                .then((data) => {
+                    console.log(data);
+
+                    productsArr = productsArr.filter((item) => item.id !== id)
+                    displayProducts(productsArr)
+                    console.log(productsArr);
+                })
+                .catch((error) => console.log(error));
+        };
+
+     
+        function updateData(item) {
+            container.innerHTML = "<h1>Data Update Here</h1>"
+            container.style.display = "block"
+            // nav.style.display = "none"
+
+            let card = document.createElement("div")
+            card.innerHTML = `
+                <div>
+                    <input type="text" id="titleVal">
+                    <input type="text" id="priceVal">
+
+                    <button id="updateBtn">Update</button>
+                    <button id="cancelBtn">Cancel</button>
+                </div>
+            `
+            container.append(card)
+
+            document.querySelector("#titleVal").value = item.title
+            document.querySelector("#priceVal").value = item.price
+
+            let update = document.querySelector("#updateBtn")
+            let cancel = document.querySelector("#cancelBtn")
+
+            update.addEventListener("click", () => {
+                let updateTitle = document.querySelector("#titleVal").value
+                item.title = updateTitle
+
+                let updatePrice = document.querySelector("#priceVal").value
+                item.price = updatePrice
+
+                localStorage.setItem("product", JSON.stringify(productsArr))
+                displayProducts(productsArr);
+
+                container.style.display = "grid";
+            })
+
+            cancel.addEventListener("click", () => {
+                displayProducts(productsArr);
+
+                container.style.display = "grid";
+            })
+        };
+
+
+
+        let search = document.querySelector("#search")
+        search.addEventListener("input", (e) => {
+            let inputVal = e.target.value.toLowerCase()
+            let filterProducts = productsArr.filter((item) => item.title.toLowerCase().includes(inputVal))
+
+            displayProducts(filterProducts);
+        });
+
+   
+        let asc = document.querySelector("#asc")
+        asc.addEventListener("click", () => {
+            let ascendingArray = productsArr.sort((a, b) => a.price - b.price)
+            displayProducts(ascendingArray)
+        });
+
+        let desc = document.querySelector("#desc")
+        desc.addEventListener("click", () => {
+            let descendingArray = productsArr.sort((a, b) => b.price - a.price)
+            displayProducts(descendingArray)
+        });
+
+        let category = document.querySelector("#category")
+        category.addEventListener("change", (e) => {
+
+            if (e.target.value === "all") return displayProducts(productsArr)
+
+            let filterCategory = productsArr.filter((item) => item.category === e.target.value)
+            displayProducts(filterCategory)
+        });
+
+        const prevbtn = document.querySelector("#prevbtn");
+        const nextbtn = document.querySelector("#nextbtn");
+        let pageNumber = document.querySelector("#showPage")
+        pageNumber.innerHTML = 1;
+        function showPage() {
+            pageNumber.innerHTML = page;
+        }
+
+        function prevpageFunction() {
+            page -= 1;
+            if (page <= 1) {
+                prevbtn.disabled = true
+            }
+            console.log(page)
+
+            fetchFunction();
+            showPage();
+        }
+
+        function nextpageFunction() {
+            if (page >= 1) {
+                prevbtn.disabled = false
+            }
+            page += 1;
+            console.log(page)
+
+            fetchFunction();
+            showPage();
+        }
+    </script>
+</body>
+
+</html>

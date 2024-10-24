@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Icon -->
+    <link rel="stylesheet" href="remix/remixicon.css" type="text/css">
+    <title>Ecommerce</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        nav {
+            background-color: #F4BC42;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        a {
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        nav .logo {
+            font-size: 28px;
+            color: black;
+        }
+
+        nav .navigation {
+            color: black;
+            background-color: white;
+            font-size: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            margin-right: 10px;
+        }
+
+        nav .ri-shopping-cart-2-line {
+            color: black;
+            font-size: 28px;
+            margin-right: 10px;
+        }
+
+        .card {
+            width: 1200px;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+            border-radius: 10px;
+            line-height: 40px;
+            font-size: 18px;
+        }
+
+        .card #description {
+            line-height: 22px;
+            font-size: 18px;
+        }
+
+        .card .item-img {
+            text-align: center;
+        }
+
+        .card .item-img img {
+            width: 500px;
+        }
+
+        .card .item-content {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            padding-left: 100px;
+        }
+
+        .ri-star-fill {
+            color: orange;
+        }
+
+        .card .btns {
+            padding: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            background: #F4BC42;
+            cursor: pointer;
+            transition: all 0.2s linear;
+
+            &:hover {
+                background: #ffcc5f;
+            }
+        }
+
+        .card .readToggle {
+            color: blue;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+     
+        <nav>
+            <a href="CRUDwithproductsapi.html" class="logo">Ecommerce</a>
+            <div>
+                <a href="./signUp.html" class="navigation">SignUp</a>
+                <a href="./login.html" class="navigation">Log In</a>
+                <a href="./Add_to_cart.html" class="navigation">Cart</a>
+            </div>
+        </nav>
+
+        <div id="container"></div>
+    </div>
+
+    <script>
+        let singleProduct = JSON.parse(localStorage.getItem("singleProduct"));
+        console.log(singleProduct);
+
+        const container = document.querySelector("#container");
+
+
+
+        // document.addEventListener("DOMContentLoaded", () => {
+            container.innerHTML = "";
+
+            let card = `
+            <div class="card">
+                <div class="item-img">
+                    <img src="${singleProduct.images[0]}">
+                </div>
+                <div class="item-content">
+                    <h2>${singleProduct.title}</h2>
+
+                    <p id="description">${singleProduct.description.substring(0, 50)}....<span onclick="descriptionFun()" class="readToggle">Read More</span></p>
+
+                    <p>Price : ${singleProduct.price}</p>
+                    <p>Brand : ${singleProduct.brand}</p>
+                    <p>Ratings : ${singleProduct.rating} <i class="ri-star-fill"></i></p>
+                    <p>Category : ${singleProduct.category}</p>
+                    <p>Status : ${singleProduct.availabilityStatus}</p>
+                    <p>Dimensions : widht : ${singleProduct.dimensions.width}, height : ${singleProduct.dimensions.height}, depth : ${singleProduct.dimensions.depth}</p>
+                    <p>Warranty : ${singleProduct.warrantyInformation}</p>
+                    <p>Return Policy : ${singleProduct.returnPolicy}</p>
+                    </div>
+                    <button id="checkOutPage" class="btns">Buy now</button>
+                    <button id="AddToCart" class="btns">Add to Cart</button>
+            </div>
+        `;
+            container.innerHTML = card;
+
+            // Read More Function
+            function descriptionFun() {
+                if (document.querySelector("#description span").innerHTML === "Read More") {
+                    document.getElementById("description").innerHTML = `${singleProduct.description} <span onclick="descriptionFun()" class="readToggle">Read Less</span>`
+                } else {
+                    document.getElementById("description").innerHTML = `${singleProduct.description.substring(0, 50)}...<span onclick="descriptionFun()" class="readToggle">Read More</span>`
+                }
+            };
+
+
+            // addtocart
+            let addtocart = document.querySelector("#AddToCart")
+            let cartData = JSON.parse(localStorage.getItem("cartData")) || [];
+            addtocart.addEventListener("click", () => {
+                let productExists = cartData.some(product => product.id === singleProduct.id);
+
+                if (!productExists) {
+                    cartData.push(singleProduct);
+                    singleProduct.quantity = 1;
+                    localStorage.setItem("cartData", JSON.stringify(cartData));
+                    alert("Product added to cart!");
+                } else {
+                    // alert("This product is already in your cart.");
+
+                    // increase quantity
+                    let i = cartData.findIndex(product => product.id === singleProduct.id);
+                    let quantity = cartData[i].quantity;
+                    cartData[i].quantity = ++quantity;
+                    alert("Product quantity increase by 1")
+                    localStorage.setItem("cartData", JSON.stringify(cartData));
+                }
+            });
+        // });
+
+
+
+    </script>
+</body>
+
+</html>

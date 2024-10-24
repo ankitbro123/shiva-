@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Icon -->
+    <link rel="stylesheet" href="remix/remixicon.css" type="text/css">
+    <title>Ecommerce</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        nav {
+            background-color: #55b2e0;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        a {
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        nav .logo {
+            font-size: 28px;
+            color: rgb(232, 217, 217);
+            &:hover {
+                color: #e1e852;
+            }
+        }
+
+        nav .navigation {
+            color: rgb(58, 47, 47);
+            background-color: white;
+            font-size: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            margin-right: 10px;
+            &:hover {
+                color:  white;
+                background: rgb(5, 5, 5);
+            }
+        }
+
+        nav .ri-shopping-cart-2-line {
+            color: rgb(58, 47, 47);
+            font-size: 28px;
+            margin-right: 10px;
+            &:hover {
+                color:  white;
+                background: rgb(5, 5, 5);
+            }
+        }
+
+        #container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: auto;
+            padding: 0 40px;
+        }
+
+        #card {
+            padding: 10px;
+            margin: 20px;
+            border-radius: 10px;
+            box-shadow: rgba(217, 225, 142, 0.2) 0px 7px 29px 0px;
+            text-align: center;
+        }
+
+        #card>img {
+            width: 150px;
+        }
+
+        .price {
+            font-size: 24px;
+            font-style: italic;
+            color: rgb(126, 141, 230);
+            margin: 10px 0;
+
+            &:hover {
+                color:  white;
+                background: rgb(5, 5, 5);
+            }
+        }
+
+        .quantities{
+            margin: 8px;
+        }
+
+        button {
+            padding: 2px;
+            font-size: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+
+        #remove {
+            padding: 8px 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <nav>
+            <a href="./CRUDwithproductsapi.html" class="logo">MAKEUP-DISCORD</a>
+            <div>
+                <a href="./signUp.html" class="navigation">SignUp</a>
+                <a href="./login.html" class="navigation">Log In</a>
+                <a href="./Add_to_cart.html" class="navigation">Cart</a>
+            </div>
+        </nav>
+
+        <div id="container"></div>
+
+    </div>
+
+
+    <script>
+        let cartData = JSON.parse(localStorage.getItem("cartData"));
+        let container = document.querySelector("#container")
+        console.log(cartData);
+        function displayCartData() {
+            container.innerHTML = "";
+            if (cartData == 0) {
+                container.innerHTML = "Cart is Empty"
+            }
+            cartData.forEach((item, i) => {
+                let card = ` <div id="card">
+            <img src=${item.images[0]} alt="">
+            <h2>${item.title}</h2>
+            <p class="price">Price : ${item.price} $</p>
+            <button onclick=dec(${i})> - </button>
+            <span class="quantities">${item.quantity}</span>
+            <button onclick=inc(${i})> + </button>
+            <div>
+                <button onclick="removeFromCartBtn(${item.id})" id="remove">Remove</button>
+            </div>
+          </div>
+          `
+                container.innerHTML += card;
+            })
+        }
+        displayCartData()
+
+        function removeFromCartBtn(id) {
+            cartData = cartData.filter((item) => item.id !== id)
+            localStorage.setItem("cartData", JSON.stringify(cartData))
+            displayCartData(cartData)
+        }
+
+        let quantities = document.querySelectorAll(".quantities")
+
+        function inc(i) {
+            let quantity = cartData[i].quantity;
+            quantities[i].innerHTML = ++quantity;
+            cartData[i].quantity = quantity;
+            localStorage.setItem("cartData", JSON.stringify(cartData));
+        }
+
+        function dec(i) {
+            let quantity = cartData[i].quantity;
+            if (quantity <= 1) {
+                cartData.splice(i, 1);
+                localStorage.setItem("cartData", JSON.stringify(cartData));
+                displayCartData(cartData);
+                return;
+            }
+            quantities[i].innerHTML = --quantity;
+            cartData[i].quantity = quantity;
+            localStorage.setItem("cartData", JSON.stringify(cartData));
+        }
+    </script>
+</body>
+
+</html>
